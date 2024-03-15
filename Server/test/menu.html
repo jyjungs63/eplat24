@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bootstrap 5 Navbar Example</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">Navbar</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link activ" href="#">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link activ" href="javascript:drawPDF()">Pdf Draw</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <iframe id="pdf" style="width: 100%; height: 1000px;"></iframe>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://unpkg.com/@pdf-lib/fontkit@0.0.4/dist/fontkit.umd.min.js"></script>
+
+    <script src="../../libpdf.js"></script>
+    <script>
+
+        var page;
+
+        const { PDFDocument, rgb, StandardFonts } = PDFLib;
+        const black = rgb(0, 0, 0);
+        const white = rgb(1, 1, 1);
+        const headcol = rgb(0.85, 0.89, 0.95);
+        const footcol = rgb(1.00, 0.91, 0.60);
+
+        async function drawPDF() {
+            const pdfDoc = await PDFDocument.create();
+            pdfDoc.registerFontkit(fontkit)
+            const fontBytes = await fetch('http://localhost:3000/purchase/NanumBarunGothic.ttf').then((res) => res.arrayBuffer());
+            const customFont = await pdfDoc.embedFont(fontBytes);
+
+            // const customFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+
+            page = pdfDoc.addPage()
+
+            const {
+                width,
+                height
+            } = page.getSize()
+
+            const fontSize = 14;
+
+            page.setFont(customFont);
+            page.setFontSize(fontSize);
+
+            const text = 'This is text in an embedded font!'
+            const textSize = 35
+            const textWidth = customFont.widthOfTextAtSize(text, textSize)
+            const textHeight = customFont.heightAtSize(textSize)
+
+            // page.drawText(text, {
+            //     x: 40,
+            //     y: 450,
+            //     size: textSize,
+            //     font: customFont,
+            //     color: rgb(0, 0.53, 0.71),
+            // })
+            // page.drawRectangle({
+            //     x: 40,
+            //     y: 450,
+            //     width: textWidth,
+            //     height: textHeight,
+            //     borderColor: rgb(1, 0, 0),
+            //     borderWidth: 1.5,
+            // })
+
+            //drawTextBox(1, 1, 10, 1, rgb(0, 0.53, 0.71), "text", 12, rgb(1, 1, 0), "left");
+
+            setOrigin(1, 27);
+            pwidth = width / cm;
+            half = pwidth / 2;
+
+            var textwd = customFont.widthOfTextAtSize("구매확인 내역서", fontSize) / cm;
+            drawRTexts(half - textwd, 0, 18, black, "구매확인 내역서")
+            moveDown(1.0);
+            drawRTexts(pwidth - 5, 0, 10, black, "2024-02-03");
+
+            moveDown(1.5);
+            drawRTextBox(0, 0, 18.5, 1, rgb(0.66, 0.82, 0.55), "계좌번호 : 경남은행) 207-0072-6907-01 이상민 (이플렛)", 10, rgb(0, 0, 0), "center");
+
+            moveDown(1);
+            drawRTextBox(0, 0, 1.5, 1, headcol, "번호", 10, black, "center");
+            drawRTextBox(1.5, 0, 1.5, 1, headcol, "단계", 10, black, "center");
+            drawRTextBox(3, 0, 5, 1, headcol, "품명", 10, black, "center");
+            drawRTextBox(8, 0, 3, 1, headcol, "수량", 10, black, "center");
+            drawRTextBox(11, 0, 3, 1, headcol, "수량", 10, black, "center");
+            drawRTextBox(14, 0, 4.5, 1, headcol, "공급가격", 10, black, "center");
+
+            moveDown(1);
+            for (let i = 0; i < 5; i++) {
+                drawRTextBox(0, 0, 1.5, 1, white, "번호", 10, black, "center");
+                drawRTextBox(1.5, 0, 1.5, 1, white, "단계", 10, black, "center");
+                drawRTextBox(3, 0, 5, 1, white, "품명", 10, black, "center");
+                drawRTextBox(8, 0, 3, 1, white, "수량", 10, black, "center");
+                drawRTextBox(11, 0, 3, 1, white, "수량", 10, black, "center");
+                drawRTextBox(14, 0, 4.5, 1, white, "공급가격", 10, black, "center");
+                moveDown(1);
+            }
+            drawRTextBox(0, 0, 14, 1, white, "총결재금액", 12, rgb(0, 0, 0), "center");
+            drawRTextBox(14, 0, 4.5, 1, white, "100000", 12, rgb(0, 0, 0), "center");
+
+            moveDown(1);
+            drawRTextBox(0, 0, 3, 1, footcol, "배송지 ", 10, black, "center");
+            drawRTextBox(3, 0, 5, 1, white, "[라인아이 유치원] ", 10, black, "left");
+            drawRTextBox(8, 0, 10.5, 1, white, "경남 김해시 인제로 190 (롯데리아 2층) ", 10, black, "left");
+
+            moveDown(1);
+            drawRTextBox(0, 0, 3, 1, footcol, "전화번호 ", 10, black, "center");
+            drawRTextBox(3, 0, 5, 1, white, "010-3345-3535 ", 10, black, "left");
+            drawRTextBox(8, 0, 3, 1, footcol, "우편번호 ", 10, black, "center");
+            drawRTextBox(11, 0, 3, 1, white, " 44701", 10, black, "left");
+            drawRTextBox(14, 0, 2, 1, footcol, "이름 ", 10, black, "center");
+            drawRTextBox(16, 0, 2.5, 1, white, "이강산 ", 10, black, "left");
+
+            const hcol = rgb(0.27, 0.45, 0.77);
+            const tcol = rgb(0.81, 0.84, 0.92);
+
+            moveDown(2);
+            drawRTextBox(0, 0, 3.5, 1, hcol, "스텝 ", 10, black, "center");
+            drawRTextBox(3.5, 0, 3.5, 1, hcol, "반명", 10, black, "center");
+            drawRTextBox(7, 0, 3.5, 1, hcol, "이름 ", 10, black, "center");
+            drawRTextBox(10.5, 0, 3.5, 1, hcol, " 아이디", 10, black, "center");
+            drawRTextBox(14, 0, 3.5, 1, hcol, "비번 ", 10, black, "center");
+
+
+            const pdfBytes = await pdfDoc.save()
+            const pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+
+            // 생성된 PDF 다운로드
+            const downloadLink = document.createElement('a');
+            downloadLink.href = window.URL.createObjectURL(pdfBlob);
+            downloadLink.download = 'output.pdf';
+            downloadLink.click();
+            // const pdfDataUri = await pdfDoc.saveAsBase64({ dataUri: true });
+            // document.getElementById('pdf').src = pdfDataUri;
+
+        }
+
+    </script>
+</body>
+
+</html>
